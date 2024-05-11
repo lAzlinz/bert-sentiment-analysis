@@ -1,1 +1,3 @@
 https://huggingface.co/blog/sentiment-analysis-python
+
+https://medium.com/@nikviz/bert-handling-class-imbalance-in-language-models-7fe9ccc62cb6
