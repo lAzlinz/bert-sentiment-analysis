@@ -3,13 +3,17 @@ from datasets import load_dataset, load_metric
 from transformers import AutoTokenizer, DataCollatorWithPadding, AutoModelForSequenceClassification, TrainingArguments, Trainer
 import numpy as np
 
+#pre-trained model name
+model_name = 'bhadresh-savani/distilbert-base-uncased-emotion'
+# model_name = 'distilbert-base-uncased'
+
 imdb = load_dataset('imdb')
 
 # only take a small part of the big imdb dataset
 small_train_dataset = imdb['train'].shuffle(seed=42).select([i for i in list(range(3_000))])
 small_test_dataset = imdb['test'].shuffle(seed=42).select([i for i in list(range(300))])
 
-tokenizer = AutoTokenizer.from_pretrained('distilbert-base-uncased')
+tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 def preprocess_function(example):
     return tokenizer(example['text'], truncation=True)
@@ -21,7 +25,7 @@ data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
 
 # training the model
-model = AutoModelForSequenceClassification.from_pretrained('distilbert-base-uncased', num_labels=3)
+model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
 
 def compute_metrics(eval_pred):
     load_accuracy = load_metric('accuracy')
