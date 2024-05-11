@@ -1,6 +1,6 @@
 import torch
 from datasets import load_dataset
-from transformers import AutoTokenizer, DataCollatorWithPadding
+from transformers import AutoTokenizer, DataCollatorWithPadding, AutoModelForSequenceClassification
 
 imdb = load_dataset('imdb')
 
@@ -17,3 +17,7 @@ tokenized_train = small_train_dataset.map(preprocess_function, batched=True)
 tokenized_test = small_test_dataset.map(preprocess_function, batched=True)
 
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
+
+# training the model
+model = AutoModelForSequenceClassification.from_pretrained('distilbert-base-uncased', num_labels=3)
