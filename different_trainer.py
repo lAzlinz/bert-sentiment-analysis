@@ -71,4 +71,7 @@ learner.autofit(
             min_delta=0.0001
         )
     ]
-) 
+)
+
+# test the result
+learner.validate()
