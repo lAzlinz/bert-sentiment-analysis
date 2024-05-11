@@ -9,6 +9,7 @@ pandas # ==1.4.1
 tensorflow # ==2.7.0
 tokenizers # ==0.10.3
 protobuf # ~=3.19.1
+tf_keras
 # transformers==4.10.3
 
 # manual installation
