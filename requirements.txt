@@ -4,11 +4,11 @@
 # accelerate
 # scikit-learn
 
-ktrain==0.30.0
-pandas==1.4.1
-tensorflow==2.7.0
-tokenizers==0.10.3
-protobuf~=3.19.1
+ktrain # ==0.30.0
+pandas # ==1.4.1
+tensorflow # ==2.7.0
+tokenizers # ==0.10.3
+protobuf # ~=3.19.1
 # transformers==4.10.3
 
 # manual installation
