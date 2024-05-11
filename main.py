@@ -1,6 +1,6 @@
 import torch
 from datasets import load_dataset, load_metric
-from transformers import AutoTokenizer, DataCollatorWithPadding, AutoModelForSequenceClassification
+from transformers import AutoTokenizer, DataCollatorWithPadding, AutoModelForSequenceClassification, TrainingArguments, Trainer
 import numpy as np
 
 imdb = load_dataset('imdb')
@@ -32,3 +32,23 @@ def compute_metrics(eval_pred):
     accuracy = load_accuracy.compute(predictions=predictions, references=labels)['accuracy']
     f1 = load_f1.compute(predictions=predictions, references=labels)['f1']
     return {'accuracy': accuracy, 'f1': f1}
+
+training_args = TrainingArguments(
+    output_dir='./models/my_model',
+    learning_rate=2e-5,
+    per_device_train_batch_size=16,
+    per_device_eval_batch_size=16,
+    num_train_epochs=2,
+    weight_decay=0.001,
+    save_strategy='epoch',
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=tokenized_train,
+    eval_dataset=tokenized_test,
+    tokenizer=tokenizer,
+    data_collator=data_collator,
+    compute_metrics=compute_metrics,
+)
