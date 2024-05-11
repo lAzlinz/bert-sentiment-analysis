@@ -1,6 +1,6 @@
 import torch
 from datasets import load_dataset
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, DataCollatorWithPadding
 
 imdb = load_dataset('imdb')
 
@@ -15,3 +15,5 @@ def preprocess_function(example):
 
 tokenized_train = small_train_dataset.map(preprocess_function, batched=True)
 tokenized_test = small_test_dataset.map(preprocess_function, batched=True)
+
+data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
