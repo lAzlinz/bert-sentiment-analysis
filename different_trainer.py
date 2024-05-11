@@ -24,3 +24,6 @@ trn, val, preproc = text.texts_from_array(
     preprocess_mode='distilbert',
     ngram_range=1
 )
+
+# model
+model = text.text_classifier('distilbert', train_data=trn, preproc=preproc)
