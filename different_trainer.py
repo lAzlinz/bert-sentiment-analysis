@@ -75,3 +75,9 @@ learner.autofit(
 
 # test the result
 learner.validate()
+
+# save model
+path_model: str = './models/different_my_model'
+learner.save_model(path_model)
+predictor = ktrain.get_predictor(learner.model, preproc)
+predictor.save(path_model)
