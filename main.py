@@ -1,6 +1,7 @@
 import torch
-from datasets import load_dataset
+from datasets import load_dataset, load_metric
 from transformers import AutoTokenizer, DataCollatorWithPadding, AutoModelForSequenceClassification
+import numpy as np
 
 imdb = load_dataset('imdb')
 
@@ -21,3 +22,13 @@ data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
 # training the model
 model = AutoModelForSequenceClassification.from_pretrained('distilbert-base-uncased', num_labels=3)
+
+def compute_metrics(eval_pred):
+    load_accuracy = load_metric('accuracy')
+    load_f1 = load_metric('f1')
+
+    logits, labels = eval_pred
+    predictions = np.argmax(logits, axis=1)
+    accuracy = load_accuracy.compute(predictions=predictions, references=labels)['accuracy']
+    f1 = load_f1.compute(predictions=predictions, references=labels)['f1']
+    return {'accuracy': accuracy, 'f1': f1}
