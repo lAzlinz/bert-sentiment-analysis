@@ -30,7 +30,11 @@ trn, val, preproc = text.texts_from_array(
 model = text.text_classifier('distilbert', train_data=trn, preproc=preproc)
 
 # handling class imbalance
-class_weights = class_weight.compute_class_weight('balanced', np.unique(df.sentiment), y_train)
+class_weights = class_weight.compute_class_weight(
+    class_weight='balanced',
+    classes=np.unique(df.sentiment),
+    y=y_train
+)
 
 weights = {}
 for index, weight in enumerate(class_weights):
