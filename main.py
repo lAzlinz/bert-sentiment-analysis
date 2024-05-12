@@ -1,17 +1,34 @@
-import torch
-from datasets import load_dataset, load_metric
+import torch, csv
+from datasets import load_metric
 from transformers import AutoTokenizer, DataCollatorWithPadding, AutoModelForSequenceClassification, TrainingArguments, Trainer
+from sklearn.model_selection import train_test_split
 import numpy as np
 
 #pre-trained model name
 model_name = 'bhadresh-savani/distilbert-base-uncased-emotion'
 # model_name = 'distilbert-base-uncased'
 
-imdb = load_dataset('imdb')
+# get the dataset
+with open('./datasets/100kDataset_withSentiment.csv', encoding='utf-8', mode='r') as f:
+    csv_reader = csv.reader(f, delimiter=',')
+    next(csv_reader)
+    X = []
+    y = []
+    for row in csv_reader:
+        X.append(row[0])
+        y.append(int(row[1]))
 
-# only take a small part of the big imdb dataset
-small_train_dataset = imdb['train'].shuffle(seed=42).select([i for i in list(range(3_000))])
-small_test_dataset = imdb['test'].shuffle(seed=42).select([i for i in list(range(300))])
+# split the dataset into train, eval, and test
+X_train_eval, X_test, y_train_eval, y_test = train_test_split(X, y, test_size=0.3, stratify=y, random_state=42)
+X_train, X_eval, y_train, y_eval = train_test_split(X_train_eval, y_train_eval, train_size=0.7, stratify=y_train_eval, random_state=42)
+
+# convert it to a dict with keys 'text' and 'label'
+def convert_to_dict(X_col, y_col):
+    return [{'text': X, 'label': y} for X, y in zip(X_col, y_col)]
+
+train_set = convert_to_dict(X_train, y_train)
+eval_set = convert_to_dict(X_eval, y_eval)
+test_set = convert_to_dict(X_test, y_test)
 
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
@@ -25,7 +42,7 @@ data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
 
 # training the model
-model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
+model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
 
 def compute_metrics(eval_pred):
     load_accuracy = load_metric('accuracy')
