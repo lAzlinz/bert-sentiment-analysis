@@ -35,8 +35,8 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 def preprocess_function(example):
     return tokenizer(example['text'], truncation=True)
 
-tokenized_train = small_train_dataset.map(preprocess_function, batched=True)
-tokenized_test = small_test_dataset.map(preprocess_function, batched=True)
+tokenized_train = train_set.map(preprocess_function, batched=True)
+tokenized_eval = eval_set.map(preprocess_function, batched=True)
 
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
@@ -68,7 +68,7 @@ trainer = Trainer(
     model=model,
     args=training_args,
     train_dataset=tokenized_train,
-    eval_dataset=tokenized_test,
+    eval_dataset=tokenized_eval,
     tokenizer=tokenizer,
     data_collator=data_collator,
     compute_metrics=compute_metrics,
