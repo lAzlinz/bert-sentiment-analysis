@@ -1,5 +1,5 @@
 import torch, csv
-from datasets import load_metric
+from sklearn.metrics import precision_score, recall_score, confusion_matrix, f1_score
 from transformers import AutoTokenizer, DataCollatorWithPadding, AutoModelForSequenceClassification, TrainingArguments, Trainer
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -45,17 +45,22 @@ data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
 
 def compute_metrics(eval_pred):
-    load_accuracy = load_metric('accuracy')
-    load_f1 = load_metric('f1')
-
-    logits, labels = eval_pred
-    predictions = np.argmax(logits, axis=1)
-    accuracy = load_accuracy.compute(predictions=predictions, references=labels)['accuracy']
-    f1 = load_f1.compute(predictions=predictions, references=labels)['f1']
-    return {'accuracy': accuracy, 'f1': f1}
+    predictions, labels = eval_pred
+    predictions = np.argmax(predictions, axis=1)
+    # for binary
+    # # return accuracy.compute(predictions=predictions, references=labels)
+    # for multi-class
+    accuracy = np.mean(predictions==labels)
+    precision = precision_score(labels, predictions, average=None)
+    recall = recall_score(labels, predictions, average=None)
+    f1 = f1_score(labels, predictions, average=None)
+    macro_f1 = f1_score(labels, predictions, average='macro')
+    weighted_f1 = f1_score(labels, predictions, average='weighted')
+    conf_mat = confusion_matrix(labels, predictions)
+    return {"accuracy": accuracy, "macro_f1": macro_f1, "weighted_f1": weighted_f1}
 
 training_args = TrainingArguments(
-    output_dir='./models/my_model',
+    output_dir='./models/unbalanced_model',
     learning_rate=2e-5,
     per_device_train_batch_size=16,
     per_device_eval_batch_size=16,
