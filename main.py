@@ -19,6 +19,7 @@ with open('./datasets/100kDataset_withSentiment.csv', encoding='utf-8', mode='r'
         y.append(int(row[1]))
 
 # split the dataset into train, eval, and test
+X, _, y, _ = train_test_split(X, y, train_size=0.25, stratify=y, random_state=42)
 X_train_eval, X_test, y_train_eval, y_test = train_test_split(X, y, test_size=0.3, stratify=y, random_state=42)
 X_train, X_eval, y_train, y_eval = train_test_split(X_train_eval, y_train_eval, train_size=0.7, stratify=y_train_eval, random_state=42)
 
@@ -91,7 +92,9 @@ training_args = TrainingArguments(
     per_device_eval_batch_size=16,
     num_train_epochs=2,
     weight_decay=0.001,
+    evaluation_strategy="epoch",
     save_strategy='epoch',
+    load_best_model_at_end=True
 )
 
 trainer = Trainer(
