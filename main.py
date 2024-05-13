@@ -2,7 +2,7 @@ import torch, csv
 from sklearn.metrics import precision_score, recall_score, confusion_matrix, f1_score
 from transformers import AutoTokenizer, DataCollatorWithPadding, AutoModelForSequenceClassification, TrainingArguments, Trainer
 from sklearn.model_selection import train_test_split
-import numpy as np
+import numpy as np, json
 
 #pre-trained model name
 model_name = 'bhadresh-savani/distilbert-base-uncased-emotion'
@@ -57,6 +57,31 @@ def compute_metrics(eval_pred):
     macro_f1 = f1_score(labels, predictions, average='macro')
     weighted_f1 = f1_score(labels, predictions, average='weighted')
     conf_mat = confusion_matrix(labels, predictions)
+
+    data: dict = {
+        'epoch': 0,
+        'accuracy': accuracy,
+        'precision': precision.tolist(),
+        'recall': recall.tolist(),
+        'f1-score': f1.tolist(),
+        'f1-score-macro': macro_f1,
+        'f1-score-weighted': weighted_f1,
+        'confusion matrix': conf_mat.tolist()
+    }
+
+    path_file: str = './record/unbalanced_model_record.json'
+    try:
+        with open(path_file, 'r') as file:
+            old_data: list[dir] = json.load(file)
+            data['epoch'] = 1 + len(old_data)
+            old_data.append(data)
+    except FileNotFoundError:
+        data['epoch'] = 1
+        old_data = [data]
+    
+    with open(path_file, 'w') as file:
+        json.dump(old_data, file, indent=4)
+
     return {"accuracy": accuracy, "macro_f1": macro_f1, "weighted_f1": weighted_f1}
 
 training_args = TrainingArguments(
