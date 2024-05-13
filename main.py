@@ -3,6 +3,7 @@ from sklearn.metrics import precision_score, recall_score, confusion_matrix, f1_
 from transformers import AutoTokenizer, DataCollatorWithPadding, AutoModelForSequenceClassification, TrainingArguments, Trainer
 from sklearn.model_selection import train_test_split
 import numpy as np, json
+from datasets import Dataset
 
 #pre-trained model name
 model_name = 'bhadresh-savani/distilbert-base-uncased-emotion'
@@ -24,20 +25,24 @@ X_train_eval, X_test, y_train_eval, y_test = train_test_split(X, y, test_size=0.
 X_train, X_eval, y_train, y_eval = train_test_split(X_train_eval, y_train_eval, train_size=0.7, stratify=y_train_eval, random_state=42)
 
 # convert it to a dict with keys 'text' and 'label'
-def convert_to_dict(X_col, y_col):
-    return [{'text': X, 'label': y} for X, y in zip(X_col, y_col)]
+def convert_to_dict_of_list(X_col, y_col):
+    return {'text': [X for X in X_col], 'label': [y for y in y_col]}
 
-train_set = convert_to_dict(X_train, y_train)
-eval_set = convert_to_dict(X_eval, y_eval)
-test_set = convert_to_dict(X_test, y_test)
+train_set = convert_to_dict_of_list(X_train, y_train)
+eval_set = convert_to_dict_of_list(X_eval, y_eval)
+test_set = convert_to_dict_of_list(X_test, y_test)
 
 tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+# convert to datasets.Dataset
+train_dataset = Dataset.from_dict(train_set)
+eval_dataset = Dataset.from_dict(eval_set)
 
 def preprocess_function(example):
     return tokenizer(example['text'], truncation=True)
 
-tokenized_train = train_set.map(preprocess_function, batched=True)
-tokenized_eval = eval_set.map(preprocess_function, batched=True)
+tokenized_train = train_dataset.map(preprocess_function)
+tokenized_eval = eval_dataset.map(preprocess_function)
 
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
