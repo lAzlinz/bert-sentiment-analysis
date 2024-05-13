@@ -6,7 +6,7 @@ import numpy as np, json
 from datasets import Dataset
 
 #pre-trained model name
-model_name = 'bhadresh-savani/distilbert-base-uncased-emotion'
+model_name = 'distilbert/distilbert-base-uncased'
 # model_name = 'distilbert-base-uncased'
 
 # get the dataset
@@ -111,3 +111,6 @@ trainer = Trainer(
     data_collator=data_collator,
     compute_metrics=compute_metrics,
 )
+
+if __name__ == '__main__':
+    trainer.train()
