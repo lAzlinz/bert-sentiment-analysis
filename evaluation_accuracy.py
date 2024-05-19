@@ -11,7 +11,7 @@ model_name = './models/balanced_model/checkpoint-3063'
 # model_name = 'distilbert-base-uncased'
 
 # get the dataset
-with open('./datasets/99k_balanced_dataset_with_sentiment.csv', encoding='utf-8', mode='r') as f:
+with open('./datasets/100kDataset_withSentiment.csv', encoding='utf-8', mode='r') as f:
     csv_reader = csv.reader(f, delimiter=',')
     next(csv_reader)
     X = []
@@ -75,7 +75,7 @@ def compute_metrics(eval_pred):
         'confusion matrix': conf_mat.tolist()
     }
 
-    path_file: str = './record/balanced_model_record.json'
+    path_file: str = './record/unbalanced_model_record.json'
     try:
         with open(path_file, 'r') as file:
             old_data: list[dir] = json.load(file)
@@ -91,7 +91,7 @@ def compute_metrics(eval_pred):
     return {"accuracy": accuracy, "macro_f1": macro_f1, "weighted_f1": weighted_f1}
 
 training_args = TrainingArguments(
-    output_dir='./models/balanced_model/asd',
+    output_dir='./models/unbalanced_model/asd',
     learning_rate=2e-5,
     per_device_train_batch_size=16,
     per_device_eval_batch_size=16,
@@ -103,7 +103,7 @@ training_args = TrainingArguments(
 )
 
 if __name__ == '__main__':
-    balanced_checkpoints = [
+    unbalanced_checkpoints = [
         '3063',
         '6126',
         '9189',
@@ -116,7 +116,7 @@ if __name__ == '__main__':
         '30630'
     ]
 
-    checkpoints = [f'./models/balanced_model/checkpoint-{balanced_checkpoint}' for balanced_checkpoint in balanced_checkpoints]
+    checkpoints = [f'./models/unbalanced_model/checkpoint-{unbalanced_checkpoint}' for unbalanced_checkpoint in unbalanced_checkpoints]
 
     for cp in checkpoints:
         model = AutoModelForSequenceClassification.from_pretrained(cp)
